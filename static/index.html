@@ -1,53 +1,97 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Captor USA - Signature</title>
+  <title>Captor USA - Signature Form</title>
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
   <style>
-    canvas { border: 2px solid black; width: 100%; height: 200px; }
-    body { font-family: Arial; padding: 30px; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      text-align: center;
+    }
+
+    form {
+      max-width: 600px;
+      margin: auto;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    canvas {
+      border: 2px solid black;
+      width: 100%;
+      height: 200px;
+      display: block;
+      touch-action: none; /* Prevents scroll interference on mobile */
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
-<h2>Customer Signature - Captor USA Corporation</h2>
+  <h2>Captor USA Corporation - Signature Form</h2>
 
-<form id="signature-form">
-  <label>Name:</label><br>
-  <input type="text" id="name" required><br><br>
-  <canvas id="signature-pad" width="600" height="200"></canvas><br>
-  <button type="button" onclick="clearPad()">Clear</button>
-  <button type="submit">Save</button>
-</form>
+  <form id="signature-form">
+    <label for="name">Customer Name:</label><br>
+    <input type="text" id="name" placeholder="Enter your full name" required><br>
 
-<script>
-  const canvas = document.getElementById("signature-pad");
-  const signaturePad = new SignaturePad(canvas);
+    <canvas id="signature-pad"></canvas><br>
 
-  function clearPad() {
-    signaturePad.clear();
-  }
+    <button type="button" onclick="clearPad()">Clear</button>
+    <button type="submit">Save Signature</button>
+  </form>
 
-  document.getElementById("signature-form").addEventListener("submit", async function(e) {
-    e.preventDefault();
-    const name = document.getElementById("name").value.trim();
-    if (!name || signaturePad.isEmpty()) {
-      alert("Please enter your name and signature.");
-      return;
+  <script>
+    const canvas = document.getElementById("signature-pad");
+    const signaturePad = new SignaturePad(canvas);
+
+    function resizeCanvas() {
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      canvas.width = canvas.offsetWidth * ratio;
+      canvas.height = canvas.offsetHeight * ratio;
+      canvas.getContext("2d").scale(ratio, ratio);
+      signaturePad.clear();
     }
 
-    const dataURL = signaturePad.toDataURL('image/png');
-    const response = await fetch("/save-signature", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: name, image: dataURL })
-    });
+    window.addEventListener("load", resizeCanvas);
+    window.addEventListener("resize", resizeCanvas);
 
-    const result = await response.json();
-    alert(result.message);
-  });
-</script>
+    function clearPad() {
+      signaturePad.clear();
+    }
+
+    document.getElementById("signature-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      if (!name || signaturePad.isEmpty()) {
+        alert("Please enter your name and sign.");
+        return;
+      }
+
+      const dataURL = signaturePad.toDataURL('image/png');
+      const response = await fetch("/save-signature", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name, image: dataURL })
+      });
+
+      const result = await response.json();
+      alert(result.message);
+      signaturePad.clear();
+    });
+  </script>
 
 </body>
 </html>

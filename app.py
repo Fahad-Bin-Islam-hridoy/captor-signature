@@ -11,7 +11,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Set up your Gmail credentials
 SENDER_EMAIL = 'captor.fahad@gmail.com'
-APP_PASSWORD = 'sqdh zaij xlzx isvw'  # paste your 16-digit app password from Google
+APP_PASSWORD = 'otqc iklx rzhr bzhc'  # paste your 16-digit app password from Google
 
 RECEIVER_EMAIL = 'captor.fahad@gmail.com'  # you’re sending to yourself
 
